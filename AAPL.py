@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 import matplotlib.pyplot as plt
+import os
 
 # Sample period
 # startdate = pd.to_datetime('20230102', format='%Y%m%d')
@@ -26,6 +27,7 @@ plt.grid(True)
 plt.show()
 
 # =============================================================================
+
 ### Checking split adjustments
 
 # Find the indices (dates) where Stock Splits are equal to 7
@@ -64,6 +66,7 @@ yfdata2['Reverse Cumulative Splits'] = yfdata2['Stock Splits'][::-1].cumprod()[:
 yfdata2['Unadjusted Close'] = yfdata2['Close'] * yfdata2['Reverse Cumulative Splits']
 
 # =============================================================================
+
 ### Checking dividend adjustments
 
 # Find the indices (dates) with the max dividend
@@ -94,7 +97,7 @@ split_data = yfdata.loc[dates_of_interest]
 # =============================================================================
 
 # Path to data directory
-filepath = r'\\lancs\homes\09\suzanode\My Documents\Market Cap'
+filepath = os.getcwd()
 
 # Import CRSP data
 crspdata = pd.read_csv(f'{filepath}\\AAPL.csv')
