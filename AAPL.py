@@ -74,19 +74,19 @@ yfdata2['DivMult'] = yfdata2.apply(
 yfdata2.at[yfdata2.index[-1], 'DivMult'] = 1
 
 # Initialize the cumulative multiplier with 1 at the end
-yfdata2['CumMult'] = 1
+yfdata2['CumMult'] = 1.0
 
 # Calculate the cumulative multiplier starting from the end
 for i in range(len(yfdata2) - 2, -1, -1):
     current_index = yfdata2.index[i]
     next_index = yfdata2.index[i + 1]
     if yfdata2.at[next_index, 'Dividends'] != 0:
-        yfdata2.at[current_index, 'CumMult'] = yfdata2.at[next_index, 'CumMult'] * yfdata2.at[next_index, 'DivMult']
+        yfdata2.at[current_index, 'CumMult'] = yfdata2.at[next_index, 'CumMult'] / yfdata2.at[current_index, 'DivMult']
     else:
         yfdata2.at[current_index, 'CumMult'] = yfdata2.at[next_index, 'CumMult']
 
 # Calculate the Adj Close by multiplying Close by CumMult
-yfdata2['Adj Close'] = yfdata2['Close'] * yfdata2['CumMult']
+yfdata2['Unadj Close'] = yfdata2['Close'] * yfdata2['CumMult']
 
 # Drop the Dividends_next column as it's no longer needed
 yfdata2.drop(columns=['Dividends_next'], inplace=True)
