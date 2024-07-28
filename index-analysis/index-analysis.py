@@ -14,7 +14,7 @@ from tkinter import messagebox
 cwd = os.getcwd()
 
 # Import data
-indexes = pd.read_csv(os.path.join(cwd, 'indexes.csv'))
+indexes = pd.read_csv(os.path.join(cwd, 'index-analysis/indexes.csv'))
 
 # =============================================================================
 # Prepare data
@@ -27,11 +27,8 @@ indexes['caldt'] = pd.to_datetime(indexes['caldt'], format='%Y%m%d')
 indexes.set_index('caldt', inplace=True)
 
 # Drop the first row and the `sprtrn` column
-indexes = indexes.drop(indexes.index[0])
+# indexes = indexes.drop(indexes.index[0])
 indexes = indexes.drop(columns=['sprtrn'])
-
-# Compute compounded price for each column starting from 1
-prices = (1 + indexes).cumprod()
 
 # =============================================================================
 # Define date range for subsetting
@@ -41,7 +38,17 @@ start_date = '1990-01-01'
 end_date = '2023-12-31'
 
 # Subset the prices DataFrame based on the date range
-prices = prices.loc[start_date:end_date]
+indexes = indexes.loc[start_date:end_date]
+
+# =============================================================================
+# Calculate prices
+# =============================================================================
+
+# Set first row of returns to zero
+indexes.iloc[0] = 0
+
+# Compute compounded price for each column starting from 1
+prices = (1 + indexes).cumprod()
 
 # =============================================================================
 # Create interactive plot
