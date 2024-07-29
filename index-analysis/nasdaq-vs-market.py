@@ -14,35 +14,36 @@ from tkinter import messagebox
 cwd = os.getcwd()
 
 # Import data
-indexes = pd.read_csv(os.path.join(cwd, 'index-analysis/nasdaq.csv'))
+market = pd.read_csv(os.path.join(cwd, 'index-analysis/indexes.csv'))
+nasdaq = pd.read_csv(os.path.join(cwd, 'index-analysis/nasdaq.csv'))
 
 # =============================================================================
 # Prepare data
 # =============================================================================
 
 # Convert `caldt` to datetime
-indexes['caldt'] = pd.to_datetime(indexes['caldt'], format='%Y%m%d')
+market['caldt'] = pd.to_datetime(market['caldt'], format='%Y%m%d')
+nasdaq['caldt'] = pd.to_datetime(nasdaq['caldt'], format='%Y%m%d')
 
 # Set `caldt` as the index
-indexes.set_index('caldt', inplace=True)
+market.set_index('caldt', inplace=True)
+nasdaq.set_index('caldt', inplace=True)
 
-# Drop the the `sprtrn` column
-# indexes = indexes.drop(columns=['sprtrn'])
+# Filter the nasdaq dataframe to keep only rows with index >= '1972-12-14'
+nasdaq = nasdaq.loc['1972-12-14':]
 
-# Identify the first non-NaN row
-first_non_nan_idx = indexes.dropna(how='all').index[0]
+# Select and rename the required columns
+market = market[['vwretd', 'ewretd']].rename(columns={'vwretd': 'market_vw', 'ewretd': 'market_ew'})
+nasdaq = nasdaq[['vwretd', 'ewretd']].rename(columns={'vwretd': 'nasdaq_vw', 'ewretd': 'nasdaq_ew'})
 
-# Find the last NaN row before the first non-NaN row
-last_nan_idx = indexes.loc[:first_non_nan_idx].index[-2]
-
-# Slice the DataFrame to include only the last NaN row before the first non-NaN row and the rest of the data
-indexes = pd.concat([indexes.loc[[last_nan_idx]], indexes.loc[first_non_nan_idx:]])
+# Merge the dataframes on their index
+indexes = pd.merge(market, nasdaq, left_index=True, right_index=True, how='inner')
 
 # =============================================================================
 # Define date range for subsetting
 # =============================================================================
 
-# start_date = '1990-01-01'
+# start_date = '2013-01-01'
 # end_date = '2023-12-31'
 
 # # Subset the prices DataFrame based on the date range
